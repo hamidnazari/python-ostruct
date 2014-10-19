@@ -1,0 +1,4 @@
+ostruct
+=======
+
+OpenStruct for Python
