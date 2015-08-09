@@ -28,3 +28,6 @@ class OpenStruct(dict):
             return OpenStruct(**value)
         else:
             return value
+
+    def iteritems(self):
+        return self.__dict__.iteritems()
