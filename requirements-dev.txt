@@ -1,0 +1,5 @@
+ipython==3.2.0
+ipdb==0.8.1
+flake8==2.4.1
+tox==2.1.1
+-r requirements-test.txt
