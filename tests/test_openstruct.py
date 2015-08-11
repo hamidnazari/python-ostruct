@@ -55,11 +55,29 @@ def test_constructor_args():
     a = OpenStruct(o)
     assert o == a
 
-    b = OpenStruct({'a': 1, 'b': 2, 'c': 4})
+    b = OpenStruct(o.__dict__)
     assert o == b
 
-    c = OpenStruct(**{'a': 1, 'b': 2, 'c': 4})
+    c = OpenStruct(**o.__dict__)
     assert o == c
+
+    with pytest.raises(TypeError):
+        OpenStruct(1)
+
+    with pytest.raises(TypeError):
+        OpenStruct(1.2)
+
+    with pytest.raises(TypeError):
+        OpenStruct(1, 2, 3)
+
+    with pytest.raises(TypeError):
+        OpenStruct([a, b])
+
+    with pytest.raises(TypeError):
+        OpenStruct('Hello!')
+
+    with pytest.raises(TypeError):
+        OpenStruct(lambda x: x**2)
 
 
 def test_comparisons():

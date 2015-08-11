@@ -7,6 +7,8 @@ class OpenStruct(dict):
             kwargs.update(**clone.__dict__)
         elif isinstance(clone, dict):
             kwargs.update(**clone)
+        elif clone is not None:
+            raise TypeError('Type to be cloned is not supported.')
 
         for key, value in kwargs.items():
             self.__dict__[key] = self.__convert(value)
