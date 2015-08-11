@@ -18,6 +18,18 @@ class OpenStruct(dict):
     def __repr__(self):
         return str(self.__dict__)
 
+    def __eq__(self, rhs):
+        if hasattr(rhs, '__dict__'):
+            return self.__dict__ == rhs.__dict__
+
+        return self.__dict__ == rhs
+
+    def __ne__(self, rhs):
+        return not self.__eq__(rhs)
+
+    def __len__(self):
+        return len(self.__dict__)
+
     def __convert(self, value):
         if isinstance(value, (list, tuple)):
             dictionary = []
