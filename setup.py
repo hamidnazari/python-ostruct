@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='ostruct',
-      version='0.2',
+      version='1.0',
       description='OpenStruct Data Structure',
       long_description='OpenStruct, the felixble data structure.',
       classifiers=[

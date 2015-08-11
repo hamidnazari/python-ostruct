@@ -1,3 +1,4 @@
+import pytest
 from ostruct import OpenStruct
 
 
@@ -73,11 +74,20 @@ def test_comparisons():
 
     assert (o1 == o2) is True
     assert (o1 != o2) is False
-    assert (o1 > o2) is False
-    assert (o1 >= o2) is True
-    assert (o1 <= o2) is True
     assert (o1 is o2) is False
     assert (o2 is o1) is False
+
+    with pytest.raises(TypeError):
+        o1 > o2
+
+    with pytest.raises(TypeError):
+        o1 < o2
+
+    with pytest.raises(TypeError):
+        o1 >= o2
+
+    with pytest.raises(TypeError):
+        o1 <= o2
 
 
 def test_iteritems():
