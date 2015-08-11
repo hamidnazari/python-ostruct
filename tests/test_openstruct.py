@@ -4,6 +4,7 @@ from ostruct import OpenStruct
 def test_empty_struct():
     o = OpenStruct()
 
+    assert o == {}
     assert isinstance(o, OpenStruct)
     assert isinstance(o.__dict__, dict)
 
@@ -44,6 +45,20 @@ def test_nested_struct():
     assert o.a.b == {'c': {'d': 10}}
     assert o.a == {'b': {'c': {'d': 10}}}
     assert o == {'a': {'b': {'c': {'d': 10}}}}
+
+
+def test_constructor_args():
+    o = OpenStruct(a=1, b=2, c=4)
+    assert o == {'a': 1, 'b': 2, 'c': 4}
+
+    a = OpenStruct(o)
+    assert o == a
+
+    b = OpenStruct({'a': 1, 'b': 2, 'c': 4})
+    assert o == b
+
+    c = OpenStruct(**{'a': 1, 'b': 2, 'c': 4})
+    assert o == c
 
 
 def test_comparisons():

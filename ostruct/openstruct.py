@@ -1,7 +1,12 @@
 class OpenStruct(dict):
     """OpenStruct, the flexible data structure."""
-    def __init__(self, **kwargs):
+    def __init__(self, clone=None, **kwargs):
         super(OpenStruct, self).__init__()
+
+        if isinstance(clone, OpenStruct):
+            kwargs.update(**clone.__dict__)
+        elif isinstance(clone, dict):
+            kwargs.update(**clone)
 
         for key, value in kwargs.items():
             self.__dict__[key] = self.__convert(value)
@@ -36,6 +41,8 @@ class OpenStruct(dict):
             for item in value:
                 dictionary.append(self.__convert(item))
             return dictionary
+        elif isinstance(value, OpenStruct):
+            return OpenStruct(**value.__dict__)
         elif isinstance(value, dict):
             return OpenStruct(**value)
         else:
