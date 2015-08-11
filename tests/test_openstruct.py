@@ -108,6 +108,16 @@ def test_comparisons():
         o1 <= o2
 
 
+def test_expand():
+    o = OpenStruct(a=1, b=2, c=4)
+
+    def function(**kwargs):
+        assert kwargs == {'a': 1, 'b': 2, 'c': 4}
+
+    function(**o.__dict__)
+    # function(**o)
+
+
 def test_iteritems():
     o = OpenStruct()
 

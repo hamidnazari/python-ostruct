@@ -20,7 +20,7 @@ class OpenStruct(dict):
             return self.__dict__.items()
 
     def items(self):
-        return self.iteritems()
+        return self.__dict__.items()
 
     def __convert(self, value):
         if isinstance(value, (list, tuple)):
