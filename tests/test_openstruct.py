@@ -122,3 +122,19 @@ def test_iteritems():
         s += value
 
     assert s == 15
+
+
+def test_items():
+    o = OpenStruct()
+
+    o.a = 1
+    o.b = 2
+    o.c = 4
+    o.d = 8
+
+    s = 0
+
+    for key, value in o.items():
+        s += value
+
+    assert s == 15
