@@ -48,7 +48,7 @@ def test_nested_struct():
     assert o == {'a': {'b': {'c': {'d': 10}}}}
 
 
-def test_constructor_args():
+def test_constructor_clone():
     o = OpenStruct(a=1, b=2, c=4)
     assert o == {'a': 1, 'b': 2, 'c': 4}
 
@@ -61,23 +61,21 @@ def test_constructor_args():
     c = OpenStruct(**o.__dict__)
     assert o == c
 
-    with pytest.raises(TypeError):
-        OpenStruct(1)
+    d = OpenStruct(**o)
+    assert o == d
 
-    with pytest.raises(TypeError):
-        OpenStruct(1.2)
 
+@pytest.mark.parametrize("arg", [
+    1,
+    1.2,
+    (1, 2, 3),
+    [{'a': 1, 'b': 2, 'c': 4}],
+    'Hello',
+    lambda x: x**2
+])
+def test_constructor_bad_args(arg):
     with pytest.raises(TypeError):
-        OpenStruct(1, 2, 3)
-
-    with pytest.raises(TypeError):
-        OpenStruct([a, b])
-
-    with pytest.raises(TypeError):
-        OpenStruct('Hello!')
-
-    with pytest.raises(TypeError):
-        OpenStruct(lambda x: x**2)
+        OpenStruct(arg)
 
 
 def test_comparisons():
@@ -115,7 +113,7 @@ def test_expand():
         assert kwargs == {'a': 1, 'b': 2, 'c': 4}
 
     function(**o.__dict__)
-    # function(**o)
+    function(**o)
 
 
 def test_iteritems():
@@ -148,3 +146,15 @@ def test_items():
         s += value
 
     assert s == 15
+
+
+def test_delete_item():
+    o = OpenStruct(a=1, b=2, c=4)
+
+    del o.b
+    assert o == {'a': 1, 'c': 4}
+
+    o.b.d.e = 10
+
+    del o.b.d
+    assert o == {'a': 1, 'c': 4, 'b': {}}

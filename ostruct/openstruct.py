@@ -1,4 +1,7 @@
-class OpenStruct(dict):
+from collections import MutableMapping
+
+
+class OpenStruct(MutableMapping):
     """OpenStruct, the flexible data structure."""
     def __init__(self, clone=None, **kwargs):
         super(OpenStruct, self).__init__()
@@ -11,7 +14,20 @@ class OpenStruct(dict):
             raise TypeError('Type to be cloned is not supported.')
 
         for key, value in kwargs.items():
-            self.__dict__[key] = self.__convert(value)
+            self.__dict__[key] = self._convert(value)
+
+    def _convert(self, value):
+        if isinstance(value, (list, tuple)):
+            dictionary = []
+            for item in value:
+                dictionary.append(self._convert(item))
+            return dictionary
+        elif isinstance(value, OpenStruct):
+            return OpenStruct(**value.__dict__)
+        elif isinstance(value, dict):
+            return OpenStruct(**value)
+        else:
+            return value
 
     def iteritems(self):
         try:
@@ -22,18 +38,20 @@ class OpenStruct(dict):
     def items(self):
         return self.__dict__.items()
 
-    def __convert(self, value):
-        if isinstance(value, (list, tuple)):
-            dictionary = []
-            for item in value:
-                dictionary.append(self.__convert(item))
-            return dictionary
-        elif isinstance(value, OpenStruct):
-            return OpenStruct(**value.__dict__)
-        elif isinstance(value, dict):
-            return OpenStruct(**value)
-        else:
-            return value
+    def keys(self):
+        return self.__dict__.keys()
+
+    def __iter__(self):
+        return self.__dict__.__iter__()
+
+    def __setitem__(self, key, value):
+        self.__dict__.__setitem__(key, value)
+
+    def __getitem__(self, key):
+        return self.__dict__.__getitem__(key)
+
+    def __delitem__(self, key):
+        self.__dict__.__delitem__(key)
 
     def __getattr__(self, key):
         if not self.__dict__.get(key):
@@ -43,6 +61,9 @@ class OpenStruct(dict):
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value
+
+    def __delattr__(self, key):
+        self.__dict__.pop(key, None)
 
     def __repr__(self):
         return str(self.__dict__)
