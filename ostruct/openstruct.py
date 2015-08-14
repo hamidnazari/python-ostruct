@@ -48,10 +48,10 @@ class OpenStruct(MutableMapping):
         return self.__dict__.__iter__()
 
     def __setitem__(self, key, value):
-        self.__dict__.__setitem__(key, value)
+        self.__setattr__(key, value)
 
     def __getitem__(self, key):
-        return self.__dict__.__getitem__(key)
+        return self.__getattr__(key)
 
     def __delitem__(self, key):
         self.__dict__.__delitem__(key)

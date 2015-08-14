@@ -125,16 +125,6 @@ def test_comparisons():
         o1 <= o2
 
 
-def test_expand():
-    o = OpenStruct(a=1, b=2, c=4)
-
-    def function(**kwargs):
-        assert kwargs == {'a': 1, 'b': 2, 'c': 4}
-
-    function(**o.__dict__)
-    function(**o)
-
-
 def test_iteritems():
     o = OpenStruct()
 
@@ -165,6 +155,20 @@ def test_items():
         s += value
 
     assert s == 15
+
+
+def test_set_get_item():
+    o = OpenStruct()
+    o['a'] = 10
+    assert o['a'] == 10
+    assert o.a == 10
+
+    o = OpenStruct()
+    o['a']['b']['c'] = 10
+    assert o['a']['b']['c'] == 10
+    assert o['a']['b'] == {'c': 10}
+    assert o['a'] == {'b': {'c': 10}}
+    assert o == {'a': {'b': {'c': 10}}}
 
 
 def test_delete_item():
