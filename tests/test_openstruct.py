@@ -65,7 +65,26 @@ def test_constructor_clone():
     assert o == d
 
 
-@pytest.mark.parametrize("arg", [
+@pytest.mark.parametrize("value,expected", [
+    (1, 1),
+    ('Hello', 'Hello'),
+    ((), ()),
+    ((1, 2), (1, 2)),
+    (('Hello', 'World'), ('Hello', 'World')),
+    ([], []),
+    ([1, 2], [1, 2]),
+    (['Hello', 'World'], ['Hello', 'World']),
+    ({'a': 1, 'b': 2}, OpenStruct({'a': 1, 'b': 2})),
+    (({'a': 1, 'b': 2}, {'c': 3}), ({'a': 1, 'b': 2}, {'c': 3})),
+    ([{'a': 1, 'b': 2}, {'c': 3}], [{'a': 1, 'b': 2}, {'c': 3}]),
+    (OpenStruct({'a': 1, 'b': 2}), OpenStruct({'a': 1, 'b': 2})),
+    ((OpenStruct({'a': 1, 'b': 2})), (OpenStruct({'a': 1, 'b': 2}))),
+    ([OpenStruct({'a': 1, 'b': 2})], [OpenStruct({'a': 1, 'b': 2})]),
+])
+def test_convert(value, expected):
+    assert OpenStruct._convert(value) == expected
+
+
     1,
     1.2,
     (1, 2, 3),

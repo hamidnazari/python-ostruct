@@ -16,15 +16,18 @@ class OpenStruct(MutableMapping):
         for key, value in kwargs.items():
             self.__dict__[key] = self._convert(value)
 
-    def _convert(self, value):
+    @classmethod
+    def _convert(cls, value):
         if isinstance(value, (list, tuple)):
-            dictionary = []
+            dictionaries = []
             for item in value:
-                dictionary.append(self._convert(item))
-            return dictionary
-        elif isinstance(value, OpenStruct):
-            return OpenStruct(**value.__dict__)
-        elif isinstance(value, dict):
+                dictionaries.append(cls._convert(item))
+
+            if isinstance(value, tuple):
+                dictionaries = tuple(dictionaries)
+
+            return dictionaries
+        elif isinstance(value, (OpenStruct, dict)):
             return OpenStruct(**value)
         else:
             return value
