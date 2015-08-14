@@ -158,6 +158,14 @@ def test_items():
     assert s == 15
 
 
+def test_keys():
+    o = OpenStruct()
+    assert o.keys() == []
+
+    o = OpenStruct(a=1, b=2, c=4)
+    assert sorted(o.keys()) == sorted(['a', 'b', 'c'])
+
+
 def test_set_get_item():
     o = OpenStruct()
     o['a'] = 10
@@ -182,3 +190,17 @@ def test_delete_item():
 
     del o.b.d
     assert o == {'a': 1, 'c': 4, 'b': {}}
+
+    del o
+    with pytest.raises(NameError):
+        assert o  # NoQA
+
+
+@pytest.mark.parametrize("value,expected", [
+    (None, 0),
+    ({'a': 1, 'b': 2, 'c': 4}, 3),
+    (OpenStruct(a=1, b=2, c=4, d=8), 4),
+])
+def test_len(value, expected):
+    o = OpenStruct(value)
+    assert len(o) == expected
