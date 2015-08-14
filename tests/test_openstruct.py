@@ -58,7 +58,7 @@ def test_constructor_clone():
     b = OpenStruct(o.__dict__)
     assert o == b
 
-    c = OpenStruct(**o.__dict__)
+    c = OpenStruct(**(o.__dict__))
     assert o == c
 
     d = OpenStruct(**o)
@@ -85,6 +85,7 @@ def test_convert(value, expected):
     assert OpenStruct._convert(value) == expected
 
 
+@pytest.mark.parametrize("value", [
     1,
     1.2,
     (1, 2, 3),
@@ -92,9 +93,9 @@ def test_convert(value, expected):
     'Hello',
     lambda x: x**2
 ])
-def test_constructor_bad_args(arg):
+def test_constructor_bad_args(value):
     with pytest.raises(TypeError):
-        OpenStruct(arg)
+        OpenStruct(value)
 
 
 def test_comparisons():
