@@ -48,7 +48,7 @@ def test_nested_struct():
     assert o == {'a': {'b': {'c': {'d': 10}}}}
 
 
-def test_constructor_args():
+def test_constructor_clone():
     o = OpenStruct(a=1, b=2, c=4)
     assert o == {'a': 1, 'b': 2, 'c': 4}
 
@@ -58,26 +58,44 @@ def test_constructor_args():
     b = OpenStruct(o.__dict__)
     assert o == b
 
-    c = OpenStruct(**o.__dict__)
+    c = OpenStruct(**(o.__dict__))
     assert o == c
 
-    with pytest.raises(TypeError):
-        OpenStruct(1)
+    d = OpenStruct(**o)
+    assert o == d
 
-    with pytest.raises(TypeError):
-        OpenStruct(1.2)
 
-    with pytest.raises(TypeError):
-        OpenStruct(1, 2, 3)
+@pytest.mark.parametrize("value,expected", [
+    (1, 1),
+    ('Hello', 'Hello'),
+    ((), ()),
+    ((1, 2), (1, 2)),
+    (('Hello', 'World'), ('Hello', 'World')),
+    ([], []),
+    ([1, 2], [1, 2]),
+    (['Hello', 'World'], ['Hello', 'World']),
+    ({'a': 1, 'b': 2}, OpenStruct({'a': 1, 'b': 2})),
+    (({'a': 1, 'b': 2}, {'c': 3}), ({'a': 1, 'b': 2}, {'c': 3})),
+    ([{'a': 1, 'b': 2}, {'c': 3}], [{'a': 1, 'b': 2}, {'c': 3}]),
+    (OpenStruct({'a': 1, 'b': 2}), OpenStruct({'a': 1, 'b': 2})),
+    ((OpenStruct({'a': 1, 'b': 2})), (OpenStruct({'a': 1, 'b': 2}))),
+    ([OpenStruct({'a': 1, 'b': 2})], [OpenStruct({'a': 1, 'b': 2})]),
+])
+def test_convert(value, expected):
+    assert OpenStruct._convert(value) == expected
 
-    with pytest.raises(TypeError):
-        OpenStruct([a, b])
 
+@pytest.mark.parametrize("value", [
+    1,
+    1.2,
+    (1, 2, 3),
+    [{'a': 1, 'b': 2, 'c': 4}],
+    'Hello',
+    lambda x: x**2
+])
+def test_constructor_bad_args(value):
     with pytest.raises(TypeError):
-        OpenStruct('Hello!')
-
-    with pytest.raises(TypeError):
-        OpenStruct(lambda x: x**2)
+        OpenStruct(value)
 
 
 def test_comparisons():
@@ -109,14 +127,13 @@ def test_comparisons():
 
 
 def test_iteritems():
+    s = 0
     o = OpenStruct()
 
     o.a = 1
     o.b = 2
     o.c = 4
     o.d = 8
-
-    s = 0
 
     for key, value in o.iteritems():
         s += value
@@ -125,6 +142,7 @@ def test_iteritems():
 
 
 def test_items():
+    s = 0
     o = OpenStruct()
 
     o.a = 1
@@ -132,9 +150,55 @@ def test_items():
     o.c = 4
     o.d = 8
 
-    s = 0
-
     for key, value in o.items():
         s += value
 
     assert s == 15
+
+
+def test_keys():
+    o = OpenStruct()
+    assert len(o.keys()) == 0
+
+    o = OpenStruct(a=1, b=2, c=4)
+    assert sorted(o.keys()) == sorted(['a', 'b', 'c'])
+
+
+def test_set_get_item():
+    o = OpenStruct()
+    o['a'] = 10
+    assert o['a'] == 10
+    assert o.a == 10
+
+    o = OpenStruct()
+    o['a']['b']['c'] = 10
+    assert o['a']['b']['c'] == 10
+    assert o['a']['b'] == {'c': 10}
+    assert o['a'] == {'b': {'c': 10}}
+    assert o == {'a': {'b': {'c': 10}}}
+
+
+def test_delete_item():
+    o = OpenStruct(a=1, b=2, c=4)
+
+    del o.b
+    assert o == {'a': 1, 'c': 4}
+
+    o.b.d.e = 10
+
+    del o.b.d
+    assert o == {'a': 1, 'c': 4, 'b': {}}
+
+    del o
+    with pytest.raises(NameError):
+        assert o  # NoQA
+
+
+@pytest.mark.parametrize("value,expected", [
+    (None, 0),
+    ({'a': 1, 'b': 2, 'c': 4}, 3),
+    (OpenStruct(a=1, b=2, c=4, d=8), 4),
+])
+def test_len(value, expected):
+    o = OpenStruct(value)
+    assert len(o) == expected
