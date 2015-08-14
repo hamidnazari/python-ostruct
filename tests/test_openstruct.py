@@ -127,14 +127,13 @@ def test_comparisons():
 
 
 def test_iteritems():
+    s = 0
     o = OpenStruct()
 
     o.a = 1
     o.b = 2
     o.c = 4
     o.d = 8
-
-    s = 0
 
     for key, value in o.iteritems():
         s += value
@@ -143,14 +142,13 @@ def test_iteritems():
 
 
 def test_items():
+    s = 0
     o = OpenStruct()
 
     o.a = 1
     o.b = 2
     o.c = 4
     o.d = 8
-
-    s = 0
 
     for key, value in o.items():
         s += value
@@ -160,7 +158,7 @@ def test_items():
 
 def test_keys():
     o = OpenStruct()
-    assert o.keys() == []
+    assert len(o.keys()) == 0
 
     o = OpenStruct(a=1, b=2, c=4)
     assert sorted(o.keys()) == sorted(['a', 'b', 'c'])
