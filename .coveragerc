@@ -1,0 +1,5 @@
+[run]
+branch = True
+source = ostruct
+[report]
+ignore_errors = True
