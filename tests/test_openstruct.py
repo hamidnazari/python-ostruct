@@ -25,6 +25,7 @@ def test_shallow_struct():
     o.a = 10
 
     assert o.a == 10
+    assert o.nonexistent_attribute is not None
 
     if o:
         assert True
@@ -63,6 +64,17 @@ def test_constructor_clone():
 
     d = OpenStruct(**o)
     assert o == d
+
+
+@pytest.mark.parametrize("kwargs,expected", [
+    ({}, "{}"),
+    ({'a': 1}, "{'a': 1}"),
+    ({'a': 1, 'b': 'Hello'}, "{'a': 1, 'b': 'Hello'}"),
+    ({'a': 1, 'b': {'b1': 1e100}}, "{'a': 1, 'b': {'b1': 1e+100}}"),
+])
+def test__repr(kwargs, expected):
+    o = OpenStruct(**kwargs)
+    assert str(o) == expected
 
 
 @pytest.mark.parametrize("value,expected", [
@@ -126,6 +138,16 @@ def test_comparisons():
         o1 <= o2
 
 
+def test_iter():
+    keys = []
+    o = OpenStruct(a=1, b=2, c=4, d=8)
+
+    for key in o:
+        keys.append(key)
+
+    assert sorted(keys) == sorted(['a', 'b', 'c', 'd'])
+
+
 def test_iteritems():
     s = 0
     o = OpenStruct(a=1, b=2, c=4, d=8)
@@ -182,6 +204,18 @@ def test_delete_attr():
     del o
     with pytest.raises(NameError):
         assert o  # NoQA
+
+
+def test_delete_item():
+    o = OpenStruct(a=1, b=2, c=4)
+
+    del o['b']
+    assert o == {'a': 1, 'c': 4}
+
+    o.b.d.e = 10
+
+    del o['b']['d']
+    assert o == {'a': 1, 'c': 4, 'b': {}}
 
 
 @pytest.mark.parametrize("value,expected", [
