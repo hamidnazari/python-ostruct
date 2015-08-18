@@ -66,15 +66,22 @@ def test_constructor_clone():
     assert o == d
 
 
-@pytest.mark.parametrize("kwargs,expected", [
-    ({}, "{}"),
-    ({'a': 1}, "{'a': 1}"),
-    ({'a': 1, 'b': 'Hello'}, "{'a': 1, 'b': 'Hello'}"),
-    ({'a': 1, 'b': {'b1': 1e100}}, "{'a': 1, 'b': {'b1': 1e+100}}"),
+@pytest.mark.parametrize("kwargs,expected,expected2", [
+    ({}, "{}", None),
+
+    ({'a': 1}, "{'a': 1}", None),
+
+    ({'a': 1, 'b': 'Hello'},
+     "{'a': 1, 'b': 'Hello'}",
+     "{'b': 'Hello', 'a': 1}"),
+
+    ({'a': 1, 'b': {'b1': 1e100}},
+     "{'a': 1, 'b': {'b1': 1e+100}}",
+     "{'b': {'b1': 1e+100}, 'a': 1}"),
 ])
-def test__repr(kwargs, expected):
+def test__repr(kwargs, expected, expected2):
     o = OpenStruct(**kwargs)
-    assert str(o) == expected
+    assert str(o) == expected or str(o) == expected2
 
 
 @pytest.mark.parametrize("value,expected", [
