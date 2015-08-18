@@ -128,12 +128,7 @@ def test_comparisons():
 
 def test_iteritems():
     s = 0
-    o = OpenStruct()
-
-    o.a = 1
-    o.b = 2
-    o.c = 4
-    o.d = 8
+    o = OpenStruct(a=1, b=2, c=4, d=8)
 
     for key, value in o.iteritems():
         s += value
@@ -143,12 +138,7 @@ def test_iteritems():
 
 def test_items():
     s = 0
-    o = OpenStruct()
-
-    o.a = 1
-    o.b = 2
-    o.c = 4
-    o.d = 8
+    o = OpenStruct(a=1, b=2, c=4, d=8)
 
     for key, value in o.items():
         s += value
@@ -178,7 +168,7 @@ def test_set_get_item():
     assert o == {'a': {'b': {'c': 10}}}
 
 
-def test_delete_item():
+def test_delete_attr():
     o = OpenStruct(a=1, b=2, c=4)
 
     del o.b
