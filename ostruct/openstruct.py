@@ -27,8 +27,8 @@ class OpenStruct(MutableMapping):
                 dictionaries = tuple(dictionaries)
 
             return dictionaries
-        elif isinstance(value, (OpenStruct, dict)):
-            return OpenStruct(**value)
+        elif isinstance(value, OpenStruct):
+            return value.__class__(**value)
         else:
             return value
 
@@ -58,7 +58,7 @@ class OpenStruct(MutableMapping):
 
     def __getattr__(self, key):
         if not self.__dict__.get(key):
-            self.__dict__[key] = OpenStruct()
+            self.__dict__[key] = self.__class__()
 
         return self.__dict__[key]
 

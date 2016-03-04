@@ -233,3 +233,61 @@ def test_delete_item():
 def test_len(value, expected):
     o = OpenStruct(value)
     assert len(o) == expected
+
+
+def test_types():
+    d = {'a': 1, 'b': 2, 'c': 3}
+
+    o = OpenStruct(
+        a=d,
+        b=OpenStruct(d)
+    )
+    o.n.o = 1
+    o.p = d
+    o.q = OpenStruct(d)
+
+    assert isinstance(o, OpenStruct)
+    assert isinstance(o.a, dict)
+    assert isinstance(o.b, OpenStruct)
+    assert isinstance(o.n, OpenStruct)
+    assert isinstance(o.n.o, int)
+    assert isinstance(o.p, dict)
+    assert isinstance(o.q, OpenStruct)
+
+
+def test_inheritance_types():
+    class TestOpenStruct(OpenStruct):
+        pass
+
+    class AnotherOpenStruct(OpenStruct):
+        pass
+
+    d = {'a': 1, 'b': 2, 'c': 3}
+
+    o = TestOpenStruct(
+        a=d,
+        b=OpenStruct(d),
+        c=TestOpenStruct(d),
+        d=AnotherOpenStruct(d),
+        e=TestOpenStruct(AnotherOpenStruct(d))
+    )
+    o.n.o = 1
+    o.p = d
+    o.q = OpenStruct(d)
+    o.r = TestOpenStruct(d)
+    o.s = AnotherOpenStruct(d)
+    o.t = TestOpenStruct(AnotherOpenStruct(d))
+
+    assert isinstance(o, TestOpenStruct)
+    assert isinstance(o.a, dict)
+    assert not isinstance(o.b, TestOpenStruct)
+    assert isinstance(o.c, TestOpenStruct)
+    assert isinstance(o.d, AnotherOpenStruct)
+    assert isinstance(o.e, TestOpenStruct)
+    assert isinstance(o.n, TestOpenStruct)
+    assert isinstance(o.n.o, int)
+    assert isinstance(o.p, dict)
+    assert not isinstance(o.q, TestOpenStruct)
+    assert isinstance(o.r, TestOpenStruct)
+    assert isinstance(o.s, AnotherOpenStruct)
+    assert isinstance(o.t, TestOpenStruct)
