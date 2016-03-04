@@ -1,14 +1,18 @@
 from setuptools import setup
 
 setup(name='ostruct',
-      version='2.0',
+      version='2.1',
       description='OpenStruct Data Structure',
       long_description='OpenStruct, the felixble data structure.',
       classifiers=[
           'Programming Language :: Python',
+          'Programming Language :: Python :: 2',
           'Programming Language :: Python :: 2.6',
           'Programming Language :: Python :: 2.7',
           'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: 3.2',
+          'Programming Language :: Python :: 3.3',
+          'Programming Language :: Python :: 3.4',
           'Intended Audience :: Developers',
           'License :: OSI Approved :: MIT License',
           'Operating System :: OS Independent',
