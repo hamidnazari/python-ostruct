@@ -19,6 +19,12 @@ def test_empty_struct():
     else:
         assert False
 
+def test_booleans():
+    o = OpenStruct(true=True, false=False)
+
+    assert o.true == True
+    assert o.false == False
+    assert isinstance(o.none, OpenStruct)
 
 def test_shallow_struct():
     o = OpenStruct()
