@@ -25,6 +25,8 @@ def test_booleans():
 
     assert o.true is True
     assert o.false is False
+    assert o['true'] is True
+    assert o['false'] is False
     assert isinstance(o.none, OpenStruct)
 
 
