@@ -1,5 +1,6 @@
 import pytest
 from ostruct import OpenStruct
+import pickle
 
 
 def test_empty_struct():
@@ -301,3 +302,17 @@ def test_inheritance_types():
     assert isinstance(o.r, TestOpenStruct)
     assert isinstance(o.s, AnotherOpenStruct)
     assert isinstance(o.t, TestOpenStruct)
+
+
+@pytest.mark.parametrize("struct", [
+    (OpenStruct(A=1, B=2, C=3)),
+    (OpenStruct(A=1, B=2, C=[1, 2, 3, 4])),
+    (OpenStruct(A=1, B=2, C=[1, 2, [3, 4]])),
+    (OpenStruct(A=1, B=2, C=OpenStruct(x=1, y=2))),
+    (OpenStruct(A="string1", B="string2",
+                C=OpenStruct(AA=OpenStruct(AAA=1, BBB="inception"))))
+])
+def test_pickling(struct):
+    bin = pickle.dumps(struct)
+    loaded = pickle.loads(bin)
+    assert struct == loaded
