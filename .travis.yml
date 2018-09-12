@@ -1,10 +1,8 @@
 sudo: false
 language: python
 after_success:
-  - pip install codecov
-  - codecov
+  - make codecov
 install:
-  - pip install -r requirements-dev.txt
+  - make install
 script:
-  - flake8
-  - tox --recreate
+  - make test
