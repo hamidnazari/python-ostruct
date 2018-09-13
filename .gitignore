@@ -7,4 +7,5 @@
 /.tox
 /.cache
 /.coverage
+/.pytest_cache
 /htmlcov
