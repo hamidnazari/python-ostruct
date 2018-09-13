@@ -16,7 +16,7 @@ car.model = 'Mustang'
 car.owner.name = 'John Doe'
 car.owner.age = 30
 
-print car # {'owner': {'age': 30, 'name': 'John Doe'}, 'make': 'Ford', 'model': 'Mustang'}
+print(car) # {'owner': {'age': 30, 'name': 'John Doe'}, 'make': 'Ford', 'model': 'Mustang'}
 ```
 
 Install
