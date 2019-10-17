@@ -24,3 +24,5 @@ Install
 ```
 $ pip install ostruct
 ```
+
+**Note:** the latest version to support Python 2.7 is `ostruct==3.0.1`.
