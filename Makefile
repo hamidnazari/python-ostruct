@@ -1,4 +1,4 @@
-.PHONY: deps codedev test clean package
+.PHONY: deps codedev test clean package upload
 default: test
 
 deps:
@@ -19,4 +19,6 @@ clean:
 package: clean
 	pip3 install -Ur requirements-build.txt
 	python3 setup.py sdist bdist_wheel
+
+upload: package
 	twine upload dist/*
