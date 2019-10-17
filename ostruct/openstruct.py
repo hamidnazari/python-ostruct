@@ -1,9 +1,9 @@
-from collections import MutableMapping
+from collections.abc import MutableMapping
 
 
 class OpenStruct(MutableMapping):
     """OpenStruct, the flexible data structure."""
-    def __init__(self, clone=None, **kwargs):
+    def __init__(self, clone=None, dict_convert=False, **kwargs):
         super(OpenStruct, self).__init__()
 
         if isinstance(clone, OpenStruct):
@@ -14,14 +14,16 @@ class OpenStruct(MutableMapping):
             raise TypeError('Type to be cloned is not supported.')
 
         for key, value in kwargs.items():
-            self.__dict__[key] = self._convert(value)
+            self.__dict__[key] = self._convert(value, dict_convert)
 
     @classmethod
-    def _convert(cls, value):
-        if isinstance(value, (list, tuple)):
+    def _convert(cls, value, dict_convert=False):
+        if dict_convert and isinstance(value, dict):
+            return cls(**value)
+        elif isinstance(value, (list, tuple)):
             dictionaries = []
             for item in value:
-                dictionaries.append(cls._convert(item))
+                dictionaries.append(cls._convert(item, dict_convert))
 
             if isinstance(value, tuple):
                 dictionaries = tuple(dictionaries)

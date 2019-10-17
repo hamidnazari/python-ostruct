@@ -8,4 +8,5 @@
 /.cache
 /.coverage
 /.pytest_cache
+/.venv
 /htmlcov
