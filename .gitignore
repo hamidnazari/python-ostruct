@@ -1,9 +1,10 @@
+.python-version
 *.pyc
+*.patch
 /build/
 /dist/
 /*.egg-info
 /venv/
-.python-version
 /.tox
 /.cache
 /.coverage
