@@ -2,7 +2,7 @@
 default: test
 
 deps:
-	pip install -r requirements-dev.txt
+	pip install -Ur requirements-dev.txt
 
 codedev:
 	pip install codecov
