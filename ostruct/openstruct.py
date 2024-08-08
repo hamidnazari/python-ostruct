@@ -65,6 +65,9 @@ class OpenStruct(MutableMapping):
         self.__dict__.__delitem__(key)
 
     def __getattr__(self, key):
+        if key.startswith('__') and key.endswith('__'):
+            return super(OpenStruct, self).__getattr__(key)
+
         if self.__dict__.get(key) is None:
             self.__dict__[key] = self.__class__()
 
