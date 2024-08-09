@@ -2,7 +2,8 @@ ostruct
 =======
 
 [![Package Status](http://img.shields.io/pypi/v/ostruct.svg)](https://pypi.python.org/pypi/ostruct)
-[![Build Status](https://travis-ci.org/hamidnazari/python-ostruct.svg?branch=master)](https://travis-ci.org/hamidnazari/python-ostruct)
+[![Quality Assurance](https://github.com/hamidnazari/python-ostruct/actions/workflows/qa.yml/badge.svg)](https://github.com/hamidnazari/python-ostruct/actions/workflows/qa.yml)
+[![Release](https://github.com/hamidnazari/python-ostruct/actions/workflows/release.yml/badge.svg)](https://github.com/hamidnazari/python-ostruct/actions/workflows/release.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/hamidnazari/python-ostruct.svg)](https://codecov.io/github/hamidnazari/python-ostruct)
 
 OpenStruct for Python.

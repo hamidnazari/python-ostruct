@@ -1,10 +1,10 @@
-.PHONY: deps codedev test clean package upload
+.PHONY: deps codecov test clean package upload
 default: test
 
 deps:
 	pip install -Ur requirements-dev.txt
 
-codedev:
+codecov:
 	pip install codecov
 	codecov
 

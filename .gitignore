@@ -11,3 +11,5 @@
 /.pytest_cache
 /.venv
 /htmlcov
+coverage.xml
+junit.xml
