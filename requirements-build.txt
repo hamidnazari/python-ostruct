@@ -1,3 +1,1 @@
-setuptools==41.4.0
-twine==1.15.0
-wheel==0.33.6
+wheel==0.44.0

@@ -1,0 +1,54 @@
+name: Quality Assurance
+
+on:
+  push:
+  pull_request:
+    branches:
+        - develop
+        - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version:
+          - 3.8.18
+          - 3.9.19
+          - 3.10.14
+          - 3.11.9
+          - 3.12.4
+          - pypy3.8
+          - pypy3.9
+          - pypy3.10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Instal Python dependencies
+        run: make deps
+
+      - name: Run test cases
+        run: make test
+        env:
+          TOXENV: py
+
+      - name: Generate coverage report
+        run: make codecov
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

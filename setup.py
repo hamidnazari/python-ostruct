@@ -1,17 +1,17 @@
 from setuptools import setup
 
 setup(name='ostruct',
-      version='4.0.0',
+      version='4.0.1',
       description='OpenStruct Data Structure',
       long_description='OpenStruct, the flexible data structure.',
       classifiers=[
           'Programming Language :: Python',
           'Programming Language :: Python :: 3',
-          'Programming Language :: Python :: 3.4',
-          'Programming Language :: Python :: 3.5',
-          'Programming Language :: Python :: 3.6',
-          'Programming Language :: Python :: 3.7',
           'Programming Language :: Python :: 3.8',
+          'Programming Language :: Python :: 3.9',
+          'Programming Language :: Python :: 3.10',
+          'Programming Language :: Python :: 3.11',
+          'Programming Language :: Python :: 3.12',
           'Intended Audience :: Developers',
           'License :: OSI Approved :: MIT License',
           'Operating System :: OS Independent',

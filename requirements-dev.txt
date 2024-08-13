@@ -1,5 +1,5 @@
-flake8==3.7.8
-ipdb==0.12.2
-ipython==6.5.0
-tox==3.14.0
+flake8==7.1.1
+ipdb==0.13.13
+setuptools==72.1.0
+tox==4.17.1
 -r requirements-test.txt
