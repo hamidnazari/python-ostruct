@@ -1,5 +1,4 @@
 flake8==7.1.1
 ipdb==0.13.13
-setuptools==72.1.0
 tox==4.17.1
 -r requirements-test.txt

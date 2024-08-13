@@ -18,14 +18,16 @@ jobs:
           python-version: 3.12
 
       - name: Build distribution packages
-        run: make test
+        run: make package
 
       - name: Store the distribution packages
         uses: actions/upload-artifact@v4
         with:
+          name: python-ostruct-distributions
           path: dist/
 
   publish:
+    needs: package
     runs-on: ubuntu-latest
 
     environment:
@@ -37,9 +39,9 @@ jobs:
 
     steps:
       - name: Download the distribution packages
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: python-package-distributions
+          name: python-ostruct-distributions
           path: dist/
 
       - name: Publish to PyPI
