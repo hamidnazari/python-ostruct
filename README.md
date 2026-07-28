@@ -1,10 +1,9 @@
 ostruct
 =======
 
-[![Package Status](http://img.shields.io/pypi/v/ostruct.svg)](https://pypi.python.org/pypi/ostruct)
-[![Quality Assurance](https://github.com/hamidnazari/python-ostruct/actions/workflows/qa.yml/badge.svg)](https://github.com/hamidnazari/python-ostruct/actions/workflows/qa.yml)
+[![PyPI](https://img.shields.io/pypi/v/ostruct.svg)](https://pypi.org/project/ostruct/)
+[![CI](https://github.com/hamidnazari/python-ostruct/actions/workflows/qa.yml/badge.svg)](https://github.com/hamidnazari/python-ostruct/actions/workflows/qa.yml)
 [![Release](https://github.com/hamidnazari/python-ostruct/actions/workflows/release.yml/badge.svg)](https://github.com/hamidnazari/python-ostruct/actions/workflows/release.yml)
-[![Coverage](https://img.shields.io/codecov/c/github/hamidnazari/python-ostruct.svg)](https://codecov.io/github/hamidnazari/python-ostruct)
 
 OpenStruct for Python.
 
@@ -22,8 +21,17 @@ print(car) # {'owner': {'age': 30, 'name': 'John Doe'}, 'make': 'Ford', 'model':
 
 Install
 -------
-```
-$ pip install ostruct
+
+```sh
+python -m pip install ostruct
 ```
 
 **Note:** the latest version to support Python 2.7 is `ostruct==3.0.1`.
+
+Development
+-----------
+
+```sh
+python -m pip install --editable ".[test,dev]"
+make lint test package
+```

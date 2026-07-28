@@ -1,48 +1,196 @@
-name: Build and Publish
+name: Release
 
 on:
-  release:
-    types:
-      - published
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PYTHONUNBUFFERED: "1"
 
 jobs:
-  package:
+  validate-tag:
+    name: Validate release tag
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Require vMAJOR.MINOR.PATCH
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Release tag must use vMAJOR.MINOR.PATCH, got $RELEASE_TAG"
+            exit 1
+          fi
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.12
-
-      - name: Build distribution packages
-        run: make package
-
-      - name: Store the distribution packages
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-ostruct-distributions
-          path: dist/
-
-  publish:
-    needs: package
+  test:
+    name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs:
+      - validate-tag
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+          - "3.14"
 
-    environment:
-      name: pypi
-      url: https://pypi.org/p/python-ostruct
+    steps:
+      - name: Check out release tag
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
 
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install test dependencies
+        run: python -m pip install ".[test]"
+
+      - name: Run tests
+        run: python -m pytest
+
+  package:
+    name: Build and attest package
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs:
+      - test
     permissions:
+      artifact-metadata: write
+      attestations: write
+      contents: read
       id-token: write
 
     steps:
-      - name: Download the distribution packages
-        uses: actions/download-artifact@v4
+      - name: Check out release tag
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          name: python-ostruct-distributions
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.14"
+          cache: pip
+
+      - name: Install build dependencies
+        run: python -m pip install "build>=1.2,<2" "twine>=6,<7"
+
+      - name: Build distributions
+        run: python -m build
+
+      - name: Verify distribution inventory
+        run: |
+          wheel_count="$(find dist -maxdepth 1 -type f -name '*.whl' | wc -l)"
+          sdist_count="$(find dist -maxdepth 1 -type f -name '*.tar.gz' | wc -l)"
+
+          test "$wheel_count" -eq 1 || {
+            echo "::error::Expected one wheel, found $wheel_count"
+            exit 1
+          }
+
+          test "$sdist_count" -eq 1 || {
+            echo "::error::Expected one source distribution, found $sdist_count"
+            exit 1
+          }
+
+      - name: Validate tag and package version
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          wheel_file="$(basename "$(find dist -maxdepth 1 -name '*.whl' -print -quit)")"
+          package_version="$(printf '%s' "$wheel_file" | cut -d- -f2)"
+          if [[ "${RELEASE_TAG#v}" != "$package_version" ]]; then
+            echo "::error::Tag $RELEASE_TAG does not match package version $package_version"
+            exit 1
+          fi
+
+      - name: Validate distribution metadata
+        run: python -m twine check dist/*
+
+      - name: Install and smoke test wheel
+        run: |
+          python -m pip install --no-deps dist/*.whl
+          cd "$(mktemp -d)"
+          python -c "from ostruct import OpenStruct; assert OpenStruct(a={'b': 1}, dict_convert=True).a.b == 1"
+
+      - name: Generate build provenance
+        uses: actions/attest@f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6 # v4
+        with:
+          subject-path: dist/*
+
+      - name: Store distributions
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: python-package-distributions
+          path: dist/
+          if-no-files-found: error
+          retention-days: 90
+
+  publish-pypi:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs:
+      - package
+    environment:
+      name: pypi
+      url: https://pypi.org/project/ostruct/
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
+        with:
+          name: python-package-distributions
           path: dist/
 
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Publish distributions
+        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
+
+  github-release:
+    name: Create GitHub release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs:
+      - package
+      - publish-pypi
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Create release and attach distributions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: >-
+          gh release create "$RELEASE_TAG" dist/*
+          --repo "$GITHUB_REPOSITORY"
+          --verify-tag
+          --generate-notes
+          --title "ostruct $RELEASE_TAG"
