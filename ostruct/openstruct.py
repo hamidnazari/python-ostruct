@@ -1,11 +1,13 @@
 from collections.abc import MutableMapping
-from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterator, List
 
 
 class OpenStruct(MutableMapping):
     """OpenStruct, the flexible data structure."""
 
-    def __init__(self, clone: Any = None, dict_convert: bool = False, **kwargs: Any) -> None:
+    def __init__(
+        self, clone: Any = None, dict_convert: bool = False, **kwargs: Any
+    ) -> None:
         super().__init__()
 
         if isinstance(clone, OpenStruct):
@@ -37,7 +39,7 @@ class OpenStruct(MutableMapping):
             return value
 
     def to_dict(self) -> Dict[str, Any]:
-        """Recursively convert OpenStruct and nested OpenStructs to standard Python dicts."""
+        """Recursively convert OpenStruct and nested OpenStructs to dicts."""
         result: Dict[str, Any] = {}
         for key, value in self.__dict__.items():
             result[key] = self._to_dict_item(value)
