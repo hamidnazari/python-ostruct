@@ -1,3 +1,4 @@
+import copy
 import pickle
 import pytest
 
@@ -229,21 +230,6 @@ def test_iter():
         'c',
         'd',
     ])
-
-
-def test_iteritems():
-    o = OpenStruct(
-        a=1,
-        b=2,
-        c=4,
-        d=8
-    )
-
-    s = 0
-    for key, value in o.iteritems():
-        s += value
-
-    assert s == 15
 
 
 def test_items():
@@ -489,3 +475,43 @@ def test_pickling(struct):
     dumped = pickle.dumps(struct)
     loaded = pickle.loads(dumped)
     assert struct == loaded
+
+
+def test_to_dict():
+    o = OpenStruct()
+    o.a = 1
+    o.b.c = 2
+    o.d = [OpenStruct(e=3), {'f': 4}]
+    o.g = (OpenStruct(h=5),)
+
+    d = o.to_dict()
+    assert type(d) is dict
+    assert d == {
+        'a': 1,
+        'b': {'c': 2},
+        'd': [{'e': 3}, {'f': 4}],
+        'g': ({'h': 5},),
+    }
+    assert type(d['b']) is dict
+    assert type(d['d'][0]) is dict
+
+
+def test_dir():
+    o = OpenStruct(foo='bar', num=123)
+    attrs = dir(o)
+    assert 'foo' in attrs
+    assert 'num' in attrs
+    assert 'to_dict' in attrs
+
+
+def test_copy_and_deepcopy():
+    o = OpenStruct(a=1, b=OpenStruct(c=2))
+    shallow = copy.copy(o)
+    assert shallow == o
+    assert shallow is not o
+    assert shallow.b is o.b
+
+    deep = copy.deepcopy(o)
+    assert deep == o
+    assert deep is not o
+    assert deep.b is not o.b
