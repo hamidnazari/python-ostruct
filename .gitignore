@@ -20,3 +20,4 @@ __pycache__/
 coverage.xml
 junit.xml
 /tmp
+ostruct/_version.py

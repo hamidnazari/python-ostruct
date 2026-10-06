@@ -1,5 +1,8 @@
 [run]
 branch = True
 source = ostruct
+omit =
+    ostruct/_version.py
+
 [report]
 ignore_errors = True

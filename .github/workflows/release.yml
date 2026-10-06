@@ -46,6 +46,7 @@ jobs:
           - "3.11"
           - "3.12"
           - "3.13"
+          - "3.14"
 
     steps:
       - name: Check out release tag
@@ -57,6 +58,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
           cache: pip
 
       - name: Install test dependencies
@@ -123,6 +125,20 @@ jobs:
 
       - name: Validate distribution metadata
         run: python -m twine check dist/*
+
+      - name: Verify wheel build from unpacked sdist
+        run: |
+          sdist_file="$(find dist -maxdepth 1 -name '*.tar.gz' -print -quit)"
+          tmpdir="$(mktemp -d)"
+          tar -xzf "$sdist_file" -C "$tmpdir"
+          unpacked_dir="$(find "$tmpdir" -maxdepth 1 -mindepth 1 -type d)"
+          python -m build --wheel "$unpacked_dir" --outdir "$tmpdir/dist"
+          sdist_wheel="$(basename "$(find "$tmpdir/dist" -maxdepth 1 -name '*.whl' -print -quit)")"
+          git_wheel="$(basename "$(find dist -maxdepth 1 -name '*.whl' -print -quit)")"
+          if [[ "$sdist_wheel" != "$git_wheel" ]]; then
+            echo "::error::Wheel version built from sdist ($sdist_wheel) does not match git wheel ($git_wheel)"
+            exit 1
+          fi
 
       - name: Install and smoke test wheel
         run: |
