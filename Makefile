@@ -1,24 +1,24 @@
-.PHONY: deps codecov test clean package upload
-default: test
+.PHONY: build clean install lint package test
 
-deps:
-	pip install -Ur requirements-dev.txt
+PYTHON ?= python3
 
-codecov:
-	pip install codecov
-	codecov
+default: lint test
 
-test: deps
-	flake8
-	tox --recreate
+install:
+	$(PYTHON) -m pip install --editable ".[test,dev]"
+
+lint:
+	$(PYTHON) -m ruff check .
+
+test:
+	$(PYTHON) -m pytest --cov=ostruct --cov-report=term-missing
 
 clean:
-	find . -name __pycache__ -type d
-	rm -rf ./.cache ./.pytest_cache ./.tox ./build ./dist ./ostruct.egg-info
+	rm -rf .cache .pytest_cache .tox build dist htmlcov
+	find . -type d -name __pycache__ -prune -exec rm -rf {} +
 
-package: clean
-	pip3 install -Ur requirements-build.txt
-	python3 setup.py sdist bdist_wheel
+build: clean
+	$(PYTHON) -m build
 
-upload: package
-	twine upload dist/*
+package: build
+	$(PYTHON) -m twine check dist/*

@@ -1,5 +1,6 @@
 import copy
 import pickle
+
 import pytest
 
 from ostruct import OpenStruct
